@@ -27,4 +27,7 @@ rule merge_counts:
     output:
         "out/gene_distributions.csv"
     shell:
-        "echo gene,{phrases} | cat - {{input}} > {{output}}".format(phrases=PHRASES)
+        "echo gene,{phrases} > {{output}}".format(phrases=PHRASES)
+        "for file in {input}; do
+        "cat $file >> {{output}}"
+        "done"
