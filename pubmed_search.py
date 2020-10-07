@@ -2,13 +2,28 @@ import pandas as pd
 import numpy as np
 from Bio import Entrez
 import plotnine as plt9
+import argparse
+
+################
+## PARAMS
+################
+
+parser = argparse.ArgumentParser()
+parser.add_argument("-g", "--gene", type=str,
+                    help="the gene to search for")
+parser.add_argument("-p", "--phrases", type=str,
+                    help="the comma separated phrases to search for")
+args = parser.parse_args()
+
+gene = args.gene
+phrases = args.phrases.split(',')
+
 
 Entrez.email = 'oa3@sanger.ac.uk'
 
-all_loci = pd.read_excel('data/LocusFocusMasterSpreadsheet.xlsx', skiprows=8)
-gene_list = pd.read_csv('data/gene_coordinates.GRCh37.ensembl_v91.txt', sep='\t',names=['ENS', 'CHR', 'START', 'END', 'STRAND', 'NAME'])
-tobi_loci = all_loci[all_loci.Assigned=='Tobi'].copy()
-tobi_loci
+##################
+## FUNCTIONS
+##################
 
 def search_pubmed(query):
     '''
@@ -19,24 +34,22 @@ def search_pubmed(query):
     handle.close()
     return(record)
 
-def phrase_gene_distributions(phrase_list, gene_list):
+def phrases_gene_counts(phrase_list, gene):
     '''
-    For a given phrase list and gene list, finds all possible
+    For a given phrase list and gene, counts how many hits they have when searched together
     '''
-    gene_counts_df = pd.DataFrame (gene_list,columns=['Gene'])
-    gene_counts_df.set_index('Gene', inplace=True)
+    counts_df = pd.DataFrame (columns=phrase_list, index=[gene])
+
     for phrase in phrase_list:
-        print(phrase)
-        for gene in gene_list:
-            try:
-                gene_counts_df.at[gene, phrase] = int(search_pubmed('{} AND {}"'.format(phrase, gene))['Count'])
-            except:
-                print('Could not search for {}'.format(gene))
-    
-    return gene_counts_df
+        count = int(search_pubmed('{} AND {}'.format(phrase, gene))['Count'])
+        counts_df.at[gene, phrase] = count
+        print(phrase,gene,count)
+    print(counts_df)
+    return counts_df
 
-keywords = ['IBD', 'inflammation', 'inflammatory bowel disease', 'Crohn\'s',
-            'Ulcerative colitis', 'immune', 'gut', 'bowel', '']
-gene_distributions = phrase_gene_distributions(keywords, gene_list['NAME'])
+#############
+## MAIN
+#############
 
-gene_distributions.to_csv('gene_phrase_distributions.csv')
+gene_phrase_counts_df = phrases_gene_counts(phrases, gene)
+gene_phrase_counts_df.to_csv('temp/{}_phrases.csv'.format(gene),header=False)
