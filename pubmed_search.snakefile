@@ -1,9 +1,9 @@
 import pandas as pd
 
-phrase_list = ["IBD", "immune"]
+phrase_list = ['IBD', 'inflammation', 'inflammatory bowel disease', 'Crohns' , 'ulcerative colitis', 'immune', 'gut', 'bowel']
 PHRASES = ','.join(phrase_list)
 gene_df = pd.read_csv('data/gene_coordinates.GRCh37.ensembl_v91.txt', sep='\t',names=['ENS', 'CHR', 'START', 'END', 'STRAND', 'NAME'])
-GENES = list(gene_df['NAME'][1:20])
+GENES = list(gene_df['NAME'])
 
 rule all:
     input:
@@ -18,7 +18,7 @@ rule find_counts:
     params:
         phrases = PHRASES
     shell:
-        "python pubmed_search.py --gene {wildcards.gene} --phrases {params.phrases}"
+        "python pubmed_search.py --gene {wildcards.gene} --phrases '{params.phrases}'"
 
 
 rule merge_counts:
