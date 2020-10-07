@@ -7,7 +7,8 @@ GENES = list(gene_df['NAME'])
 
 rule all:
     input:
-        "out/gene_distributions.csv"
+        "out/gene_distributions.csv",
+        "out/gene_normaliser.csv"
 
 
 rule find_counts:
@@ -20,6 +21,14 @@ rule find_counts:
     shell:
         "python pubmed_search.py --gene {wildcards.gene} --phrases '{params.phrases}'"
 
+rule find_background:
+    output:
+        "temp/{gene}_no-phrase.csv"
+    conda:
+        "conda-env_data-science.yml"
+    shell:
+        "python pubmed_search.py --gene {wildcards.gene} --phrases NONE"
+        
 
 rule merge_counts:
     input:
@@ -28,4 +37,13 @@ rule merge_counts:
         "out/gene_distributions.csv"
     run:
         shell("echo gene,{phrases} > {{output}}".format(phrases=PHRASES))
+        shell("for file in temp/*; do cat $file >> {output}; done")
+
+rule merge_normalised:
+    input:
+        expand("temp/{gene}_no-phrase.csv",gene=GENES)
+    output:
+        "out/gene_normaliser.csv"
+    run:
+        shell("echo gene,BACKGROUND > {output}")
         shell("for file in temp/*; do cat $file >> {output}; done")

@@ -38,13 +38,17 @@ def phrases_gene_counts(phrase_list, gene):
     '''
     For a given phrase list and gene, counts how many hits they have when searched together
     '''
-    counts_df = pd.DataFrame (columns=phrase_list, index=[gene])
+    counts_df = pd.DataFrame(columns=phrase_list, index=[gene])
 
     for phrase in phrase_list:
-        count = int(search_pubmed('{} AND {}'.format(phrase, gene))['Count'])
-        counts_df.at[gene, phrase] = count
-        print(phrase,gene,count)
-    print(counts_df)
+        if phrase == 'NONE':
+            count = int(search_pubmed('{}'.format(gene))['Count'])
+            no_phrase_df = pd.DataFrame(columns=['BACKGROUND'], index=[gene])
+            no_phrase_df.at[gene, phrase] = count
+            no_phrase_df.to_csv('temp/{}_no-phrase.csv'.format(gene),header=False)
+        else:
+            count = int(search_pubmed('{} AND {}'.format(phrase, gene))['Count'])
+            counts_df.at[gene, phrase] = count
     return counts_df
 
 #############
