@@ -3,7 +3,7 @@ import pandas as pd
 phrase_list = ['IBD', 'inflammation', 'inflammatory bowel disease', 'Crohns' , 'ulcerative colitis', 'immune', 'gut', 'bowel']
 PHRASES = ','.join(phrase_list)
 gene_df = pd.read_csv('data/gene_coordinates.GRCh37.ensembl_v91.txt', sep='\t',names=['ENS', 'CHR', 'START', 'END', 'STRAND', 'NAME'])
-GENES = list(gene_df['NAME'][1:5])
+GENES = list(gene_df['NAME'])
 
 rule all:
     input:
@@ -28,4 +28,4 @@ rule merge_counts:
         "out/gene_distributions.csv"
     run:
         shell("echo gene,{phrases} > {{output}}".format(phrases=PHRASES))
-        shell("for file in {input}; do cat $file >> {output}; done")
+        shell("for file in temp/*; do cat $file >> {output}; done")
