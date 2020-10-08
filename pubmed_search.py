@@ -44,16 +44,16 @@ def phrases_gene_counts(phrase_list, gene):
         if phrase == 'NONE':
             count = int(search_pubmed('{}'.format(gene))['Count'])
             no_phrase_df = pd.DataFrame(columns=['BACKGROUND'], index=[gene])
-            no_phrase_df.at[gene, phrase] = count
+            no_phrase_df.at[gene, 'BACKGROUND'] = count
             no_phrase_df.to_csv('temp/{}_no-phrase.csv'.format(gene),header=False)
         else:
             count = int(search_pubmed('{} AND {}'.format(phrase, gene))['Count'])
             counts_df.at[gene, phrase] = count
-    return counts_df
+            gene_phrase_counts_df.to_csv('temp/{}_phrases.csv'.format(gene),header=False)
+    return none
 
 #############
 ## MAIN
 #############
 
-gene_phrase_counts_df = phrases_gene_counts(phrases, gene)
-gene_phrase_counts_df.to_csv('temp/{}_phrases.csv'.format(gene),header=False)
+phrases_gene_counts(phrases, gene)
