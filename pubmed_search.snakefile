@@ -7,8 +7,8 @@ GENES = list(gene_df['NAME'])
 
 rule all:
     input:
-        "out/gene_distributions.csv",
-        "out/gene_normaliser.csv"
+        "out/gene-phrases_search.csv",
+        "out/gene-only_search.csv"
 
 
 rule find_counts:
@@ -34,16 +34,16 @@ rule merge_counts:
     input:
         expand("temp/{gene}_phrases.csv",gene=GENES)
     output:
-        "out/gene_distributions.csv"
+        "out/gene-phrases_search.csv"
     run:
         shell("echo gene,{phrases} > {{output}}".format(phrases=PHRASES))
-        shell("for file in temp/*; do cat $file >> {output}; done")
+        shell("for file in temp/*phrases.csv; do cat $file >> {output}; done")
 
 rule merge_normalised:
     input:
         expand("temp/{gene}_no-phrase.csv",gene=GENES)
     output:
-        "out/gene_normaliser.csv"
+        "out/gene-only_search.csv"
     run:
         shell("echo gene,BACKGROUND > {output}")
-        shell("for file in temp/*; do cat $file >> {output}; done")
+        shell("for file in temp/*no-phrase.csv; do cat $file >> {output}; done")
