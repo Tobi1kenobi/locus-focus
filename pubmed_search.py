@@ -1,7 +1,6 @@
 import pandas as pd
 import numpy as np
 from Bio import Entrez
-import plotnine as plt9
 import argparse
 
 ################

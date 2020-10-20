@@ -31,18 +31,19 @@ pubmed_score <- function(quant_mat, gene, dataframe){
   {
     greater_thans <- dataframe[dataframe$gene==gene,3:length(dataframe)] > quant_mat[percent,]
     gene_score <- gene_score + sum(greater_thans)
-    # print(greater_thans)
+    print(greater_thans)
   }
   return(gene_score)
 }
 
 pubmed_score(quant_mat = quants, gene = "NOD2", dataframe = norm_gene_phrases_df)
-pubmed_score(quant_mat = quants, gene = "TTN", dataframe = norm_gene_phrases_df)
+pubmed_score(quant_mat = quants, gene = "IFNGR2", dataframe = norm_gene_phrases_df)
+
 
 my_loci <- read_excel(here::here('data/LocusFocusMasterSpreadsheet.xlsx'),skip = 8) %>%
   filter(Assigned=='Tobi')
 
-lapply(strsplit(my_loci$`Genes in locus`, ','),FUN = function(gene_list){
+pubmeds <- lapply(strsplit(my_loci$`Genes in locus`, ','),FUN = function(gene_list){
   scores <- rep(-1, length(gene_list))
   names(scores) <- gene_list
   for (gene in gene_list){
@@ -78,7 +79,7 @@ plotting.tib <- norm_gene_phrases_df %>%
 
 ggplot(data=plotting.tib, aes(x=phrase, y=score, colour=Quantile)) + 
   geom_quasirandom(alpha=0.3) +
-  geom_label(data=subset(plotting.tib, gene == 'NOD2' | gene == 'TTN'),
+  geom_label(data=subset(plotting.tib, gene == 'CD40'),
             aes(x=phrase,y=score,label=gene),position=position_quasirandom())+
   scale_colour_brewer(palette = "YlOrRd",na.value='grey') +
   theme_classic()
