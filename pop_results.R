@@ -2,6 +2,8 @@ library(here)
 library(tidyverse)
 library(EnsDb.Hsapiens.v79)
 
+# Read in results, and get Gene IDs from Ensembl names
+
 pops.16 <- read_tsv(here('results/IBD_DeLange2017.16.results'))
 pops.16 <- pops.16 %>% 
   mutate(GENEID = ENSGID) %>% 
